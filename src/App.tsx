@@ -37,7 +37,7 @@ function App() {
       <BackgroundScene />
       
       <main className="relative z-10 flex flex-col items-center justify-center p-8 h-[60vh] md:h-screen">
-        <div className="absolute top-8 left-8 text-left hidden md:block">
+        <div className="absolute top-8 left-8 text-left hidden md:block text-white">
           <h1 className="text-2xl font-bold opacity-90 tracking-wide drop-shadow-sm">Aesthetic Work With Me</h1>
           <p className="text-sm opacity-80 mt-1 font-medium">Focus with music, voice reminders, and live weather.</p>
         </div>
@@ -70,6 +70,10 @@ function App() {
               <ClockDisplay />
             </div>
           )}
+        </div>
+
+        <div className="absolute bottom-8 left-8 text-left hidden md:block text-white/60 text-xs font-medium tracking-wide">
+          &copy; {new Date().getFullYear()} Aesthetic Work With Me. Created by Shanky Robot.
         </div>
       </main>
 
