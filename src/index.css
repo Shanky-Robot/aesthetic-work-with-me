@@ -1,0 +1,62 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --color-primary: #1e293b;
+    --color-secondary: #475569;
+    --color-accent: #6366f1;
+    --color-background: #f8fafc;
+    --color-surface: rgba(255, 255, 255, 0.7);
+  }
+  
+  .theme-rainy {
+    --color-primary: #e2e8f0;
+    --color-secondary: #94a3b8;
+    --color-accent: #818cf8;
+    --color-background: #0f172a;
+    --color-surface: rgba(30, 41, 59, 0.5);
+  }
+
+  .theme-sunny {
+    --color-primary: #4338ca;
+    --color-secondary: #6366f1;
+    --color-accent: #f59e0b;
+    --color-background: #fdf6e3;
+    --color-surface: rgba(255, 255, 255, 0.6);
+  }
+  
+  .theme-gradient {
+    --color-primary: #ffffff;
+    --color-secondary: #e2e8f0;
+    --color-accent: #f472b6;
+    --color-background: #000000; /* overridden by gradient styles */
+    --color-surface: rgba(255, 255, 255, 0.2);
+  }
+
+  body {
+    @apply text-primary bg-background;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  }
+}
+
+.rain-drop {
+  position: absolute;
+  width: 2px;
+  height: 20px;
+  background: rgba(255, 255, 255, 0.4);
+  bottom: 100%;
+  animation: rainFall linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
