@@ -10,6 +10,7 @@ export const useVoiceAnnouncements = () => {
   const synth = typeof window !== 'undefined' ? window.speechSynthesis : null;
   
   const lastAnnouncedMinuteRef = useRef<number | null>(null);
+  const currentUtteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
 
   // Load voices and listen for changes
   useEffect(() => {
@@ -71,9 +72,15 @@ export const useVoiceAnnouncements = () => {
   const speak = useCallback((text: string) => {
     if (!enabled || !synth) return;
 
+    // Cancel any ongoing speech
     synth.cancel();
 
     const utterance = new SpeechSynthesisUtterance(text);
+    
+    // Crucial: keep a reference to the utterance to prevent garbage collection
+    // which often causes speech to cut off mid-sentence in Chrome/Safari.
+    currentUtteranceRef.current = utterance;
+
     if (voiceURI) {
       const selectedVoice = voices.find((v) => v.voiceURI === voiceURI);
       if (selectedVoice) {
@@ -83,6 +90,14 @@ export const useVoiceAnnouncements = () => {
     utterance.volume = volume;
     utterance.rate = rate;
     
+    // Clear the ref when speaking finishes
+    utterance.onend = () => {
+      currentUtteranceRef.current = null;
+    };
+    utterance.onerror = () => {
+      currentUtteranceRef.current = null;
+    };
+
     synth.speak(utterance);
   }, [enabled, synth, voices, voiceURI, volume, rate]);
 
