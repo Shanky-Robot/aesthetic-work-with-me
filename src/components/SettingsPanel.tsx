@@ -248,6 +248,31 @@ export const SettingsPanel: React.FC = () => {
                     </button>
 
                     <div className="pt-4 border-t border-white/20 mt-4 space-y-4">
+                      <span className="block opacity-80 mb-2 text-xs uppercase font-semibold tracking-wider">Timer Reminders</span>
+                      <label className="flex items-center space-x-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={settings.voice.intervalReminderEnabled}
+                          onChange={(e) => updateSettings({ voice: { ...settings.voice, intervalReminderEnabled: e.target.checked } })}
+                          className="rounded text-accent focus:ring-accent w-4 h-4"
+                        />
+                        <span className="opacity-90">Voice reminders during timer</span>
+                      </label>
+                      <label className={`block transition-opacity ${!settings.voice.intervalReminderEnabled ? 'opacity-50 pointer-events-none' : ''}`}>
+                        <span className="block opacity-80 mb-1">Interval</span>
+                        <select
+                          value={settings.voice.intervalReminderMinutes}
+                          onChange={(e) => updateSettings({ voice: { ...settings.voice, intervalReminderMinutes: parseInt(e.target.value) } })}
+                          className="w-full p-2 rounded-lg bg-white/50 border border-white/40 focus:ring-2 focus:ring-accent/50 outline-none"
+                        >
+                          <option value="1">Every minute</option>
+                          <option value="5">Every 5 minutes</option>
+                          <option value="10">Every 10 minutes</option>
+                        </select>
+                      </label>
+                    </div>
+
+                    <div className="pt-4 border-t border-white/20 mt-4 space-y-4">
                       <span className="block opacity-80 mb-2 text-xs uppercase font-semibold tracking-wider">Clock Announcements</span>
                       <label className="flex items-center space-x-2 cursor-pointer">
                         <input

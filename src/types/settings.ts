@@ -49,5 +49,5 @@ export interface AppSettings {
 
 export interface SettingsContextType {
   settings: AppSettings;
-  updateSettings: (newSettings: Partial<AppSettings>) => void;
+  updateSettings: (newSettings: Partial<AppSettings> | ((prev: AppSettings) => Partial<AppSettings>)) => void;
 }

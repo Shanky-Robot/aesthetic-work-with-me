@@ -71,9 +71,12 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     document.body.className = `theme-${settings.theme}`;
   }, [settings]);
 
-  const updateSettings = (newSettings: Partial<AppSettings>) => {
-    setSettings((prev) => ({ ...prev, ...newSettings }));
-  };
+  const updateSettings = React.useCallback((newSettings: Partial<AppSettings> | ((prev: AppSettings) => Partial<AppSettings>)) => {
+    setSettings((prev) => {
+      const update = typeof newSettings === 'function' ? newSettings(prev) : newSettings;
+      return { ...prev, ...update };
+    });
+  }, []);
 
   return (
     <SettingsContext.Provider value={{ settings, updateSettings }}>

@@ -104,106 +104,99 @@ export const MusicPlayer: React.FC = () => {
     }
   };
 
+  /*
   const ytOpts: YouTubeProps['opts'] = {
     height: '0',
     width: '0',
     playerVars: {
-      listType: 'playlist',
-      list: settings.music.selectedPlaylistId || '',
-      autoplay: 0,
+      autoplay: autoPlay ? 1 : 0,
     },
   };
+  */
 
   return (
-    <section className="bg-white/40 backdrop-blur-md rounded-2xl p-6 shadow-sm border border-white/20">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="font-semibold text-lg flex items-center gap-2">
-          {isYouTubeMode ? <Youtube size={20} className="text-red-500" /> : <Music size={20} />} 
-          {isYouTubeMode ? 'YouTube Music' : 'Local Music'}
-        </h3>
-      </div>
-
-      <div className="text-center mb-4">
-        <p className="font-medium text-primary truncate">
-          {isYouTubeMode ? ytTrackTitle : currentTrack.title}
-        </p>
-        <p className="text-xs opacity-70 truncate">
-          {isYouTubeMode ? 'YouTube Playlist' : currentTrack.artist}
-        </p>
-        {errorMsg && <p className="text-xs text-red-500 mt-1">{errorMsg}</p>}
-      </div>
+    <div className="flex flex-col items-center gap-6 w-full">
+      {/* YouTube Mini-Player */}
+      {isYouTubeMode && settings.music.selectedPlaylistId && (
+        <div className={`overflow-hidden rounded-2xl shadow-2xl border border-white/20 transition-all duration-500 transform ${isPlaying ? 'scale-100 opacity-100' : 'scale-95 opacity-80'}`}>
+          <YouTube 
+            opts={{
+              height: '180',
+              width: '320',
+              playerVars: {
+                listType: 'playlist',
+                list: settings.music.selectedPlaylistId || '',
+                autoplay: 0,
+                modestbranding: 1,
+                controls: 0, // We use our own controls
+              },
+            }} 
+            onReady={onYtReady} 
+            onStateChange={onYtStateChange} 
+            onError={() => setErrorMsg('YouTube playback error.')} 
+          />
+        </div>
+      )}
 
       {!isYouTubeMode && (
         <audio
           ref={audioRef}
           src={currentTrack.url}
           onEnded={playNext}
-          onError={() => { setErrorMsg('Track not found. Place audio in public/audio/'); setIsPlaying(false); }}
+          onError={() => { setErrorMsg('Track not found.'); setIsPlaying(false); }}
           onPlay={() => setIsPlaying(true)}
           onPause={() => setIsPlaying(false)}
         />
       )}
-      
-      {isYouTubeMode && settings.music.selectedPlaylistId && (
-        <div className="hidden">
-          <YouTube opts={ytOpts} onReady={onYtReady} onStateChange={onYtStateChange} onError={() => setErrorMsg('YouTube playback error.')} />
+
+      {/* Media Bar */}
+      <div className="bg-white/10 backdrop-blur-2xl rounded-full px-8 py-3 border border-white/20 shadow-xl flex flex-wrap items-center justify-center gap-8">
+        {/* Track Info (Minimal) */}
+        <div className="flex flex-col items-center min-w-[120px] max-w-[200px]">
+          <p className="text-xs font-semibold text-white truncate w-full text-center">
+            {isYouTubeMode ? ytTrackTitle : currentTrack.title}
+          </p>
+          <div className="flex items-center gap-1 opacity-50">
+            {isYouTubeMode ? <Youtube size={10} /> : <Music size={10} />}
+            <span className="text-[10px] uppercase tracking-widest">
+              {isYouTubeMode ? 'YouTube' : 'Local'}
+            </span>
+          </div>
         </div>
-      )}
 
-      <div className="flex items-center justify-center space-x-4 mb-4">
-        <button onClick={playPrev} className="p-2 rounded-full hover:bg-white/50 transition-colors" aria-label="Previous Track">
-          <SkipBack size={20} />
-        </button>
-        <button onClick={togglePlay} className="p-3 rounded-full bg-accent text-white shadow-md hover:bg-accent/90 transition-colors" aria-label={isPlaying ? 'Pause Music' : 'Play Music'}>
-          {isPlaying ? <Pause size={20} className="fill-current" /> : <Play size={20} className="fill-current ml-1" />}
-        </button>
-        <button onClick={playNext} className="p-2 rounded-full hover:bg-white/50 transition-colors" aria-label="Next Track">
-          <SkipForward size={20} />
-        </button>
-      </div>
-
-      <div className="flex items-center space-x-2">
-        <Volume2 size={16} className="opacity-60" />
-        <input
-          type="range"
-          min="0"
-          max="1"
-          step="0.01"
-          value={settings.music.volume}
-          onChange={handleVolumeChange}
-          className="w-full h-2 bg-slate-700/60 rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-accent [&::-webkit-slider-thumb]:rounded-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent/80 transition-shadow min-w-[100px]"
-          aria-label="Music volume"
-          aria-valuemin={0}
-          aria-valuemax={100}
-          aria-valuenow={Math.round(settings.music.volume * 100)}
-        />
-      </div>
-
-      {!isYouTubeMode && (
-        <div className="mt-4 pt-4 border-t border-white/20 max-h-32 overflow-y-auto">
-          <p className="text-[10px] uppercase tracking-wider opacity-50 mb-2 font-semibold">Playlist</p>
-          <ul className="space-y-1">
-            {TRACKS.map((track, idx) => (
-              <li key={track.id}>
-                <button
-                  onClick={() => {
-                    setCurrentTrackIndex(idx);
-                    if (isPlaying) {
-                      setTimeout(() => audioRef.current?.play(), 50);
-                    }
-                  }}
-                  className={`w-full text-left px-2 py-1.5 rounded-lg text-sm transition-colors ${
-                    idx === currentTrackIndex ? 'bg-white/60 font-medium' : 'hover:bg-white/30 opacity-80'
-                  }`}
-                >
-                  {track.title}
-                </button>
-              </li>
-            ))}
-          </ul>
-          <p className="text-[9px] opacity-40 mt-3 text-center">Music sourced from CC / YouTube Audio Library</p>
+        {/* Controls */}
+        <div className="flex items-center gap-6">
+          <button onClick={playPrev} className="text-white/70 hover:text-white transition-colors" aria-label="Previous">
+            <SkipBack size={20} />
+          </button>
+          <button 
+            onClick={togglePlay} 
+            className="w-12 h-12 rounded-full bg-white text-primary flex items-center justify-center shadow-lg hover:scale-105 transition-transform"
+            aria-label={isPlaying ? 'Pause' : 'Play'}
+          >
+            {isPlaying ? <Pause size={24} className="fill-current" /> : <Play size={24} className="fill-current ml-1" />}
+          </button>
+          <button onClick={playNext} className="text-white/70 hover:text-white transition-colors" aria-label="Next">
+            <SkipForward size={20} />
+          </button>
         </div>
-      )}
-    </section>
+
+        {/* Volume & Error */}
+        <div className="flex flex-col items-center gap-1">
+          <div className="flex items-center gap-3">
+            <Volume2 size={14} className="text-white/60" />
+            <input
+              type="range"
+              min="0" max="1" step="0.01"
+              value={settings.music.volume}
+              onChange={handleVolumeChange}
+              className="w-24 h-1 bg-white/20 rounded-full appearance-none cursor-pointer accent-white"
+              aria-label="Volume"
+            />
+          </div>
+          {errorMsg && <p className="text-[9px] text-red-400 mt-1">{errorMsg}</p>}
+        </div>
+      </div>
+    </div>
   );
 };
